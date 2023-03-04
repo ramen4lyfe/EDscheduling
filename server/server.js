@@ -2,26 +2,25 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 8000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB databases
-const bookingDB = 'mongodb://localhost/booking';
-mongoose.connect(bookingDB, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log(`Connected to MongoDB bookings database!`))
-  .catch((err) => console.log(err));
+const bookingDB = mongoose.createConnection('mongodb://localhost/booking', { useNewUrlParser: true, useUnifiedTopology: true });
+const employeeDB = mongoose.createConnection('mongodb://localhost/employee', { useNewUrlParser: true, useUnifiedTopology: true });
+const shiftDB = mongoose.createConnection('mongodb://localhost/shift', { useNewUrlParser: true, useUnifiedTopology: true });
 
-const employeeDB = 'mongodb://localhost/employee';
-mongoose.connect(employeeDB, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log(`Connected to MongoDB employee database!`))
-  .catch((err) => console.log(err));
+// Handle connection events
+bookingDB.on('error', (err) => console.error(err));
+bookingDB.once('open', () => console.log(`Connected to MongoDB bookings database!`));
 
-const shiftDB = 'mongodb://localhost/shift';
-mongoose.connect(shiftDB, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log(`Connected to MongoDB shift database!`))
-  .catch((err) => console.log(err));
+employeeDB.on('error', (err) => console.error(err));
+employeeDB.once('open', () => console.log(`Connected to MongoDB employee database!`));
+
+shiftDB.on('error', (err) => console.error(err));
+shiftDB.once('open', () => console.log(`Connected to MongoDB shift database!`));
 
 // Import route files
 const bookingRoutes = require('./routes/booking.routes');
